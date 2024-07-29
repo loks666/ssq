@@ -1,2 +1,2 @@
 // config.js
-export const BASE_URL = 'http://127.0.0.1:11021';
+export const BASE_URL = 'https://1.94.3.71:11021/api';

@@ -3,11 +3,12 @@ from typing import Dict, List, Union, Type, Callable
 
 import pymysql
 import uvicorn
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, APIRouter
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+api = APIRouter()
 # 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,
@@ -65,11 +66,6 @@ class ProbabilityDetailResponse(BaseModel):
 class CombinedAllResponse(BaseModel):
     numbers: str
     detail: Dict[str, List[Union[NumberFrequency, NumberProbability]]]
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
 
 
 def execute_query(query: str) -> List[Dict[str, Union[int, float]]]:
@@ -171,38 +167,44 @@ def get_combined_all_response(fetch_function: Callable[[str, str, str], List[Dic
     return CombinedAllResponse(numbers=numbers, detail=detail)
 
 
-@app.get("/frequency_numbers", response_model=CombinedResponse)
+@api.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
+@api.get("/frequency_numbers", response_model=CombinedResponse)
 async def frequency_numbers() -> CombinedResponse:
     return get_combined_response(fetch_data, "frequency")
 
 
-@app.get("/frequency_detail", response_model=DetailResponse)
+@api.get("/frequency_detail", response_model=DetailResponse)
 async def frequency_detail(count: int = Query(0, description="Number of latest records to consider")) -> BaseModel:
     return get_detail_response(fetch_data, count, "frequency", DetailResponse)
 
 
-@app.get("/probability_numbers", response_model=ProbabilityResponse)
+@api.get("/probability_numbers", response_model=ProbabilityResponse)
 async def probability_numbers() -> CombinedResponse:
     return get_combined_response(fetch_probability_data, "probability")
 
 
-@app.get("/probability_detail", response_model=ProbabilityDetailResponse)
+@api.get("/probability_detail", response_model=ProbabilityDetailResponse)
 async def probability_detail(
         count: int = Query(0, description="Number of latest records to consider")) -> BaseModel:
     return get_detail_response(fetch_probability_data, count, "probability", ProbabilityDetailResponse)
 
 
-@app.get("/frequency_all", response_model=CombinedAllResponse)
+@api.get("/frequency_all", response_model=CombinedAllResponse)
 async def frequency_all(
         count: int = Query(0, description="Number of latest records to consider")) -> CombinedAllResponse:
     return get_combined_all_response(fetch_data, count, "frequency")
 
 
-@app.get("/probability_all", response_model=CombinedAllResponse)
+@api.get("/probability_all", response_model=CombinedAllResponse)
 async def probability_all(
         count: int = Query(0, description="Number of latest records to consider")) -> CombinedAllResponse:
     return get_combined_all_response(fetch_probability_data, count, "probability")
 
+app.include_router(api, prefix="/api")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=11021)
