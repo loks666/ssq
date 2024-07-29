@@ -1,6 +1,6 @@
 fastapi
 pydantic
-PyMySQL
+pymysql
 selenium
 starlette
 uvicorn

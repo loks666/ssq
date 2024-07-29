@@ -108,3 +108,5 @@ dist-ssr
 *.sw?
 *.zip
 *.exe
+
+ssq/

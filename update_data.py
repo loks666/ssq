@@ -12,10 +12,10 @@ is_windows = os.name == 'nt'
 
 # 数据库配置
 db_config = {
-    'host': 'localhost',
+    'host': 'localhost' if is_windows else 'mysql',
     'port': 3306,
     'user': 'root',
-    'password': '数据库密码' if is_windows else '数据库密码!',
+    'password': 'Lx284190056' if is_windows else 'Lx284190056!',
     'database': 'lottery'
 }
 
@@ -27,18 +27,28 @@ driver = None
 
 def init_driver():
     global driver
-    # 初始化 WebDriver
-    chrome_driver_path = "./chromedriver.exe" if is_windows else "./chromedriver"
-    plugin_path = "./xpathHelper.crx"
+    if is_windows:
+        chrome_driver_path = "./chromedriver.exe"
+        plugin_path = "./xpathHelper.crx"
 
-    options = webdriver.ChromeOptions()
-    # 如果你有插件需要加载，请取消下一行的注释
-    options.add_extension(plugin_path)
-    # 如果需要无头模式，请取消下一行的注释
-    options.add_argument("--headless")
+        options = webdriver.ChromeOptions()
+        options.add_extension(plugin_path)
+        options.add_argument("--headless")
 
-    service = Service(chrome_driver_path)
-    driver = webdriver.Chrome(service=service, options=options)
+        service = Service(chrome_driver_path)
+        driver = webdriver.Chrome(service=service, options=options)
+    else:
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--remote-debugging-port=9222")
+
+        driver = webdriver.Remote(
+            command_executor='http://chrome:3000/webdriver',
+            options=options
+        )
     return driver
 
 

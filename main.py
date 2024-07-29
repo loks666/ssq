@@ -22,10 +22,11 @@ is_windows = os.name == 'nt'
 
 # 数据库配置
 db_config = {
+    # 'host': 'mysql.superxiang.com',
     'host': 'localhost',
     'port': 3306,
     'user': 'root',
-    'password': '数据库密码' if is_windows else '数据库密码!',
+    'password': 'Lx284190056!' if is_windows else 'Lx284190056!',
     'database': 'lottery'
 }
 

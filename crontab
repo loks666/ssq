@@ -1,0 +1,2 @@
+# 每天11:30执行更新数据脚本
+30 11 * * * python /app/update_data.py
